@@ -1,0 +1,119 @@
+AromaPalette: Project Overview and Code Explanation
+This document provides a complete breakdown of the AromaPalette (Khushboo) project, from the initial data processing and machine learning model training to the final interactive web application.
+
+Part 1: The Project's Goal
+AromaPalette is a full-stack web application designed to predict the primary taste or aroma (e.g., "sweet," "bitter," "floral") of a chemical molecule based on its structure. It bridges the gap between complex chemistry and an intuitive user experience, allowing users to:
+
+Analyze Single Molecules: Predict the taste of any molecule by entering its common name or SMILES string.
+
+Design Custom Blends: Experiment with a "Perfume Mixer" to combine different ingredients and predict the dominant scent of the blend.
+
+The project is divided into two main parts: a Machine Learning Pipeline that trains the predictive model and a Web Application that serves this model to users.
+
+Part 2: The Machine Learning Pipeline
+This is the core scientific engine of the project. A series of Python scripts are run in a specific order to take raw chemical data and turn it into a predictive model.
+
+1. process_data.py - Cleaning the Raw Data
+Purpose: To gather data from multiple messy CSV files and combine them into a single, clean, and standardized dataset.
+
+How it Works:
+
+It reads various datasets (e.g., bitter-train.csv, sweet-test.csv).
+
+It standardizes the column names (e.g., renaming "Name" and "canonical_smiles" to "name" and "smiles").
+
+It cleans the 'taste' labels (e.g., converting "Sweet" to "sweet").
+
+It removes duplicate molecules and rows with missing information.
+
+Key Library: pandas for data manipulation.
+
+Output: A clean file named processed_taste_data.csv.
+
+2. feature_engineering.py - Understanding the Molecules
+Purpose: To translate the chemical structures (SMILES strings) into a numerical format that a machine learning model can understand. This process is called feature engineering.
+
+How it Works:
+
+It iterates through each molecule in the clean dataset.
+
+Using the rdkit library, it calculates key molecular descriptors for each molecule. These are numerical properties like:
+
+MW: Molecular Weight
+
+LogP: A measure of how oily/water-soluble the molecule is.
+
+HBD/HBA: Counts of hydrogen bond donors and acceptors, which are crucial for interactions.
+
+Key Library: rdkit for cheminformatics.
+
+Output: A new file, data_with_features.csv, which contains the original data plus these new numerical features.
+
+3. data_prep.py - Preparing Data for Training
+Purpose: To perform the final steps needed before feeding the data to a model.
+
+How it Works:
+
+Label Encoding: It converts the text-based 'taste' labels (like "sweet", "bitter") into numbers (0, 1, 2, etc.) because models can only work with numbers. It saves this mapping in label_encoder.joblib.
+
+Splitting Data: It divides the dataset into a training set (used to teach the model) and a testing set (used to evaluate how well the model learned). This is crucial to prevent the model from simply memorizing the data.
+
+Key Libraries: scikit-learn for machine learning utilities, joblib for saving the encoder.
+
+Outputs: X_train.csv, y_train.csv, X_test.csv, y_test.csv, and label_encoder.joblib.
+
+4. train_rf.py - Building the Predictive Model
+Purpose: To train the actual machine learning model that will make the predictions.
+
+How it Works:
+
+It loads the prepared training and testing data.
+
+It initializes a Random Forest Classifier, a powerful model that is good at finding complex patterns.
+
+It "trains" the model by showing it the features (X_train) and the correct answers (y_train).
+
+It evaluates the model's performance on the unseen test data to see how accurate it is.
+
+Key Libraries: scikit-learn for the model, joblib to save the trained model.
+
+Output: The final, trained prediction engine: random_forest_model.joblib.
+
+Part 3: The Web Application
+This is how the trained model is made available to the world through a user-friendly website.
+
+1. app.py - The Backend Brain
+Purpose: To act as the server that listens for requests from the website, uses the model to make predictions, and sends the results back.
+
+How it Works:
+
+It uses the Flask web framework to create a simple API.
+
+/predict endpoint: When a user wants to analyze one molecule, the frontend sends a request here. The backend uses cirpy to find the molecule's SMILES string from its name, calculates its features with rdkit, and then uses the loaded random_forest_model.joblib to predict the taste. It also generates a 2D image of the molecule.
+
+/blend endpoint: For the Perfume Mixer, this endpoint takes a list of molecules, predicts the taste for each one, and determines the most common (dominant) scent in the blend.
+
+Key Libraries: Flask, rdkit, cirpy, joblib.
+
+2. templates/index.html - The Website's Skeleton
+Purpose: To define the structure and content of the webpage.
+
+How it Works: It contains all the HTML elements, such as the title, input boxes for the molecule name and SMILES string, the "Predict" buttons, and the containers where the results will be displayed.
+
+3. static/style.css - The Website's Appearance
+Purpose: To control the visual design of the website.
+
+How it Works: It contains all the CSS rules for colors, fonts, layout, spacing, and animations, making the website look polished and professional, matching the "Khushboo" design.
+
+4. static/script.js - The Website's Interactivity
+Purpose: To make the website dynamic and responsive to user actions.
+
+How it Works:
+
+It listens for events, like a user clicking the "Predict Taste" button.
+
+When an event occurs, it uses the fetch function to send the user's input to the correct endpoint on the Flask backend (/predict or /blend).
+
+While waiting for the backend to respond, it shows a loading animation.
+
+Once it receives the prediction data from the backend, it dynamically updates the index.html to display the results (the predicted taste, the molecule image, etc.) without needing to reload the entire page.
