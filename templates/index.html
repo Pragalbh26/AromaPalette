@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Khushboo - AI Perfumist Studio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root">
+        <main class="container">
+            <header class="hero-section">
+                <h1>Khushboo</h1>
+                <p>AI Perfumist & Flavor Designer</p>
+            </header>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="predict">Single Molecule</button>
+                <button class="tab-btn" data-tab="mix">Perfume Mixer</button>
+            </div>
+
+            <!-- Single Molecule Analyzer -->
+            <div id="predict" class="tab-content active">
+                <div class="card input-card">
+                    <h2>Molecule Analyzer</h2>
+                    <p>Enter a molecule name or SMILES string to predict its scent profile.</p>
+                    <div class="input-group">
+                        <input type="text" id="molecule-identifier" placeholder="e.g., Vanillin or C8H8O3">
+                        <button id="predict-btn">Predict</button>
+                    </div>
+                </div>
+                <div class="card result-card" id="analyzer-results-container" style="display: none;">
+                     <div id="analyzer-loader" class="loader" style="display: none;"></div>
+                     <div id="analyzer-results">
+                        <div class="result-header">
+                            <h3 id="result-prediction"></h3>
+                            <p id="result-smiles"></p>
+                        </div>
+                        <div class="molecule-visual">
+                            <img id="molecule-image" src="" alt="Molecule Structure">
+                        </div>
+                    </div>
+                </div>
+                 <div class="card result-card placeholder" id="analyzer-placeholder">
+                    <p>Prediction results will appear here.</p>
+                </div>
+            </div>
+
+            <!-- Perfume Mixer -->
+            <div id="mix" class="tab-content">
+                <div class="card input-card">
+                    <h2>Perfume Mixer</h2>
+                    <p>Select from common ingredients to create your own unique fragrance blend.</p>
+                     <select id="ingredient-select">
+                        <option value="" disabled selected>Add an ingredient...</option>
+                        <!-- Options will be populated by script.js -->
+                    </select>
+                    <div id="blend-list-container">
+                        <h3>Your Blend</h3>
+                        <ul id="blend-list"></ul>
+                    </div>
+                    <button id="blend-btn">Blend Perfume</button>
+                </div>
+                <div class="card result-card" id="mixer-results-container" style="display: none;">
+                    <div id="mixer-loader" class="loader" style="display: none;"></div>
+                    <div id="mixer-results">
+                        <h3>Dominant Scent</h3>
+                        <p id="dominant-scent"></p>
+                    </div>
+                </div>
+                <div class="card result-card placeholder" id="mixer-placeholder">
+                     <p>Your blend's dominant scent will appear here.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
+
